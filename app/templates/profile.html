@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="container rounded bg-white mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3 border-right">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                <img class="rounded-circle mt-5" width="150px" src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
+                <span class="font-weight-bold">{{ current_user.username }}</span>
+                <span class="text-black-50">{{ current_user.email }}</span>
+            </div>
+        </div>
+        <div class="col-md-5 border-right">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right">Profile Settings</h4>
+                </div>
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="labels">First Name</label>
+                            {{ form.first_name(class="form-control", placeholder="First name") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">Last Name</label>
+                            {{ form.last_name(class="form-control", placeholder="Last name") }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="labels">Mobile Number</label>
+                            {{ form.phone(class="form-control", placeholder="Enter phone number") }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Address Line 1</label>
+                            {{ form.address(class="form-control", placeholder="Enter address line 1") }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Email ID</label>
+                            {{ form.email(class="form-control", placeholder="Enter email ID") }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Education</label>
+                            {{ form.education(class="form-control", placeholder="Education") }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="labels">Country</label>
+                            {{ form.country(class="form-control", placeholder="Country") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">State/Region</label>
+                            {{ form.state(class="form-control", placeholder="State/Region") }}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="labels">Profile Picture</label>
+                        {{ form.picture(class="form-control") }}
+                    </div>
+                    <div class="mt-5 text-center">
+                        <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center experience">
+                    <span>Edit Experience</span>
+                    <span class="border px-3 p-1 add-experience">
+                        <i class="fa fa-plus"></i>&nbsp;Experience
+                    </span>
+                </div>
+                <br>
+                <div class="col-md-12">
+                    <label class="labels">Experience in Designing</label>
+                    {{ form.experience(class="form-control", placeholder="Experience in designing") }}
+                </div>
+                <br>
+                <div class="col-md-12">
+                    <label class="labels">Additional Details</label>
+                    {{ form.additional_details(class="form-control", placeholder="Additional details") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

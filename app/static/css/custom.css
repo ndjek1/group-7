@@ -193,3 +193,44 @@ footer .social-links li a {
     color: #fff; /* White text color */
     border-bottom: 3px solid #FF5722; /* Orange border bottom */
 }
+/* Custom CSS for card images */
+.card-img-top {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
+}
+
+/* Additional card styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #6c757d;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+}
+
+
+.custom-img {
+    max-height: 190px; /* Adjust this value as needed */
+    object-fit: cover;
+}
+.custom-img-news {
+    max-height: 158px; /* Adjust this value as needed */
+    object-fit: cover;
+}

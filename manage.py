@@ -7,6 +7,4 @@ app = create_app()
 migrate = Migrate(app, db)
 
 if __name__ == '__main__':
-    from flask.cli import FlaskGroup
-    cli = FlaskGroup(app)
-    cli()
+    app.run(debug=True)

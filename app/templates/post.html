@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<html>
+  <head>
+    <title>Alumina Engagement Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/comment.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/post.css')}}">
+  </head>
+  <body>
+    <div class="container ">
+      <div class="row justify-content-center">
+          <div class="col-md-8">
+              <div class="post-content">
+                <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" alt="post-image" class="img-responsive post-image">
+                <div class="post-container">
+                  <img src="{{ url_for('static', filename='profile_pics/' + post.user.image_file) }}" alt="user" class="profile-photo-md pull-left">
+                  <div class="post-detail">
+                    <div class="user-info">
+                      <h5><a href="timeline.html" class="profile-link">{{post.user.username}}</a> </h5>
+                      <p class="text-muted">Published on{{ post.date_posted.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <div class="reaction">
+                      <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{ post.likes | length }}</a>
+                      <a class="btn text-red"><i class="fa fa-comment"></i> {{ post.comments | length }}</a>
+                    </div>
+                    <div class="line-divider"></div>
+                    <div class="post-text">
+                      <p>{{post.content}} <i class="em em-anguished"></i> <i class="em em-anguished"></i> <i class="em em-anguished"></i></p>
+                    </div>
+                    <div class="line-divider"></div>
+                    {% for comment in comments %}
+                    <div class="post-comment">
+                      <img src="{{ url_for('static', filename='profile_pics/' + (comment.user.image_file if comment.user.is_authenticated else 'default.png')) }}" alt="" class="profile-photo-sm">
+                      <p><a href="timeline.html" class="profile-link">{{ comment.user.username if comment.user else comment.author_name }} </a><i class="em em-laughing"></i> {{ comment.content }} </p>
+                    </div>
+                   {% endfor %}
+                    <div class="post-comment">
+                      {% if current_user.is_authenticated %}
+                      <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file)  }}" alt="" class="profile-photo-sm">
+                      {% else %}
+                      <img src="{{ url_for('static', filename='profile_pics/default.png')  }}" alt="" class="profile-photo-sm">
+                      {% endif %}
+                      <form method="POST" action="{{ url_for('main.post', post_id=post.id) }}">
+                          {{ form.hidden_tag() }}
+                          {% if not current_user.is_authenticated %}
+                              <div class="form-group">
+                                  {{ form.name(class="form-control form-control-lg") }}
+                              </div>
+                          {% else %}
+                          <div class="form-group">
+                              {{ form.content(class="form-control form-control-lg") }}
+                          </div>
+                          {% endif%}
+                          <div class="form-group">
+                              {{ form.submit(class="btn btn-outline-info") }}
+                          </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+      
+  
+  {% endblock %}
+  
+  </body>
+</html>

@@ -55,7 +55,7 @@ section {
     text-align: start;
     margin: 10px;
 }
-.card-img-top{
+.rounded-circle{
     height: 100px;
     width: 100px;
     
@@ -64,6 +64,8 @@ section {
 .container h2{
     text-align: start;
 }
+
+
 
 .about ul {
     list-style-type: disc;
@@ -161,3 +163,25 @@ footer .social-links li a {
     cursor: pointer;
     border: solid 1px #BA68C8
 }
+
+.card {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.card-text, .card-title {
+    margin-bottom: auto;
+}
+
+.card-body .btn {
+    margin-top: auto;
+}
+
+

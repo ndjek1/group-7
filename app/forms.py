@@ -1,6 +1,6 @@
 # app/forms.py
 from flask_wtf import FlaskForm
-from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField
+from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from app.models import User
 from flask_wtf.file import FileAllowed
@@ -54,3 +54,21 @@ class UpdateProfileForm(FlaskForm):
     additional_details = StringField('Additional Details')
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png','jpeg'])])
     submit = SubmitField('Save Profile')
+
+class PostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    image_file = FileField('Image', validators=[FileAllowed(['jpg', 'png','jpeg'])])
+    submit = SubmitField('Publish')
+
+class CommentForm(FlaskForm):
+    content = StringField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post')
+
+class AnonymousCommentForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    content = StringField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post')
+
+class LikeForm(FlaskForm):
+    submit = SubmitField('Like')

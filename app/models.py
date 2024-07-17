@@ -1,4 +1,3 @@
-# app/models.py
 from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
@@ -22,12 +21,32 @@ class User(db.Model, UserMixin):
     experience = db.Column(db.String(200), nullable=True)
     additional_details = db.Column(db.String(200), nullable=True)
     password = db.Column(db.String(60), nullable=False)
-
-
+    posts = db.relationship('Post', backref='author', lazy=True)
+    comments = db.relationship('Comment', backref='author', lazy=True)
+    likes = db.relationship('Like', backref='user', lazy=True)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
+    image_file = db.Column(db.String(20), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('user_posts', lazy=True))
+    likes = db.relationship('Like', backref='post', lazy=True)
+    comments = db.relationship('Comment', backref='post', lazy=True)
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for non-authenticated users
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    ip_address = db.Column(db.String(45), nullable=True)  # To store IP address of the liker
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for non-authenticated users
+    user = db.relationship('User', backref=db.backref('user_cmnt', lazy=True))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    author_name = db.Column(db.String(50), nullable=True)  # To store author name for non-authenticated users

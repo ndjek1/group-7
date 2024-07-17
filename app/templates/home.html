@@ -151,6 +151,27 @@
     </div>
 </section>
 
+<!-- Alumni Success Stories -->
+<section class="success-stories" id="post">
+  <div class="container">
+      <h2>Latest activities</h2>
+      <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for post in posts%}
+        <div class="col">
+          <div class="card h-100">
+            <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" class="card-img-top" alt="..." style="width: 100%;">
+            <div class="card-body">
+              <h5 class="card-title">{{post.title}}</h5>
+              <p class="card-text">{{post.content}}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <a href="{{url_for('main.posts')}}" class="btn btn-primary mt-5 text-start ml-0">View all posts</a>
+  </div>
+</section>
+
 <!-- Latest News -->
 <section class="news" id="latest-news">
     <div class="container">

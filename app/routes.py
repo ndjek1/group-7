@@ -1,4 +1,8 @@
+
 from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app
+
+from flask import Blueprint, flash, render_template, redirect, url_for, request, current_app
+
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
@@ -22,6 +26,7 @@ def posts():
     posts = Post.query.all()
 
     return render_template('all_posts.html', posts=posts)
+
 
 @main.route("/profile", methods=['GET', 'POST'])  # Add POST method to the route
 @login_required
@@ -63,6 +68,10 @@ def profile():
     form.additional_details.data = current_user.additional_details
     
     return render_template('profile.html', title='Profile', form=form)
+
+@main.route("/opportunities")
+def opportunities():
+    return render_template('opportunities.html')
 
 def save_picture(form_picture):
     _, f_ext = os.path.splitext(form_picture.filename)

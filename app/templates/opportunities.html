@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+Connect - Alumina
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Networking and Opportunities</h1>
+    <p>
+       <h4> Welcome to the platform that connects you with a world of opportunities and helps you stay connected with your alma mater.</h4>
+    </p>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 mb-4">
+                <img src="/static/images/job-opportunities.jpeg" class="card-img-top" alt="Job Opportunities">
+                <div class="card-body">
+                    <h3 class="card-title">Job Opportunities</h3>
+                    <p class="card-text">Explore job openings and career opportunities exclusively for our alumni community.</p>
+                    <a href="/jobs" class="btn btn-primary">View Job Opportunities</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 mb-4">
+                <img src="/static/images/alumni-network.png" class="card-img-top custom-img" alt="Alumni Network">
+                <div class="card-body">
+                    <h3 class="card-title">Alumni Network</h3>
+                    <p class="card-text">Connect with fellow alumni, expand your professional network, and foster meaningful relationships.</p>
+                    <a href="/network" class="btn btn-primary">Connect with Alumni</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 mb-4">
+                <img src="/static/images/news and events.png" class="card-img-top custom-img-news" alt="News and Events">
+                <div class="card-body">
+                    <h3 class="card-title">News and Events</h3>
+                    <p class="card-text">Stay updated with the latest news, announcements, and events related to your alma mater.</p>
+                    <a href="/news" class="btn btn-primary">View News and Events</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 mb-4">
+                <img src="/static/images/alumnistory.webp" class="card-img-top custom-img" alt="Alumni Stories">
+                <div class="card-body">
+                    <h3 class="card-title">Alumni Stories</h3>
+                    <p class="card-text">Read inspiring stories and experiences shared by our alumni community.</p>
+                    <a href="/stories" class="btn btn-primary">Read Alumni Stories</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

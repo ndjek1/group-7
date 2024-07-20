@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation with {{ user2.first_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Conversation with {{ user2.first_name }}</h1>
+
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {% if message.sender_id == current_user.id %}you{% endif %}">
+                <strong>{{ message.sender_id == current_user.id and 'You' or user1.first_name }}:</strong> 
+                {{ message.content }} <em>({{ message.date_sent }})</em>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="{{ url_for('conversations.view_conversation', conversation_id=conversation.id) }}">
+        {{ form.hidden_tag() }}
+        <label for="content">Message:</label>
+        {{ form.content(class="form-control", required=True) }}
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</body>
+</html>

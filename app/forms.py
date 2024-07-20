@@ -1,6 +1,6 @@
 # app/forms.py
 from flask_wtf import FlaskForm
-from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField
+from wtforms import FileField, IntegerField,TextAreaField, StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from app.models import User
 from flask_wtf.file import FileAllowed
@@ -54,3 +54,8 @@ class UpdateProfileForm(FlaskForm):
     additional_details = StringField('Additional Details')
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png','jpeg'])])
     submit = SubmitField('Save Profile')
+
+class MessageForm(FlaskForm):
+    
+    content = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('send')

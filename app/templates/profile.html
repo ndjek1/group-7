@@ -5,9 +5,9 @@
     <div class="row">
         <div class="col-md-3 border-right">
             <div class="d-flex flex-column align-items-center text-center p-3 py-5">
-                <img class="rounded-circle mt-5" width="150px" src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
-                <span class="font-weight-bold">{{ current_user.username }}</span>
-                <span class="text-black-50">{{ current_user.email }}</span>
+                <img class="rounded-circle mt-5" width="150px" src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}">
+                <span class="font-weight-bold">{{ user.username }}</span>
+                <span class="text-black-50">{{ user.email }}</span>
             </div>
         </div>
         <div class="col-md-5 border-right">
@@ -15,6 +15,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-right">Profile Settings</h4>
                 </div>
+                {% if is_current_user %}
                 <form method="POST" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                     <div class="row mt-2">
@@ -63,28 +64,52 @@
                         <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
                     </div>
                 </form>
+                {% else %}
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="labels">First Name</label>
+                        <p>{{ user.first_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="labels">Last Name</label>
+                        <p>{{ user.last_name }}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label class="labels">Mobile Number</label>
+                        <p>{{ user.phone }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="labels">Address Line 1</label>
+                        <p>{{ user.address }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="labels">Email ID</label>
+                        <p>{{ user.email }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="labels">Education</label>
+                        <p>{{ user.education }}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="labels">Country</label>
+                        <p>{{ user.country }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="labels">State/Region</label>
+                        <p>{{ user.state }}</p>
+                    </div>
+                    <a href="{{url_for('conversations.start_conversation', user_id=user.id)}}">
+                        <button type="submit" class="btn btn-primary">Send Message</button></a>
+                </div>
+
+                {% endif %}
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="p-3 py-5">
-                <div class="d-flex justify-content-between align-items-center experience">
-                    <span>Edit Experience</span>
-                    <span class="border px-3 p-1 add-experience">
-                        <i class="fa fa-plus"></i>&nbsp;Experience
-                    </span>
-                </div>
-                <br>
-                <div class="col-md-12">
-                    <label class="labels">Experience in Designing</label>
-                    {{ form.experience(class="form-control", placeholder="Experience in designing") }}
-                </div>
-                <br>
-                <div class="col-md-12">
-                    <label class="labels">Additional Details</label>
-                    {{ form.additional_details(class="form-control", placeholder="Additional details") }}
-                </div>
-            </div>
-        </div>
+        
     </div>
 </div>
 {% endblock %}

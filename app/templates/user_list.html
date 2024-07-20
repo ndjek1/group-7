@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="container">
+    <style>
+        /* Container styling */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+h1.my-4 {
+    font-size: 2.5rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* List group styling */
+.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* List group item styling */
+.list-group-item {
+    display: block;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.list-group-item:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+/* Active list group item styling */
+.list-group-item-action:active {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+    </style>
+    <h1 class="my-4">Users</h1>
+    <div class="list-group">
+        {% for user in users %}
+        <a href="{{ url_for('main.view_user_profile', user_id=user.id) }}" class="list-group-item list-group-item-action">
+            {{ user.username }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

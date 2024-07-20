@@ -1,0 +1,74 @@
+<!-- app/templates/conversations_list.html -->
+
+{% extends "base.html" %}
+
+{% block title %}
+Conversations
+{% endblock %}
+
+{% block content %}
+<h2>Conversations</h2>
+<style>
+    /* Container styling */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+h2 {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* List styling */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* List item styling */
+ul li {
+    margin-bottom: 10px;
+}
+
+ul li a {
+    display: block;
+    padding: 15px 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+ul li a:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+/* Active list item styling */
+ul li a:active {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+</style>
+<ul>
+    {% for conversation in conversations %}
+        <li>
+            <a href="{{ url_for('conversations.view_conversation',conversation_id=conversation.id) }}">
+            conversation with {{ conversation.user2.username }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

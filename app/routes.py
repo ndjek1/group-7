@@ -1,11 +1,9 @@
-<<<<<<< HEAD
 from flask import Blueprint, abort, flash, render_template, redirect, url_for, request, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
 from app.forms import UpdateProfileForm, MessageForm
 from app.models import User, Conversation, Message
-=======
 
 from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app
 
@@ -17,7 +15,6 @@ from app import db
 import uuid
 from app.forms import AnonymousCommentForm, CommentForm, LikeForm, PostForm, UpdateProfileForm
 from sqlalchemy.orm import joinedload
->>>>>>> bf4b78e4a6b065271e2e5cf88d66e0ed3db5cb3f
 import os
 
 from app.models import Comment, Like, Post
@@ -94,7 +91,6 @@ def save_picture(form_picture):
     form_picture.save(picture_path)
     return picture_fn
 
-<<<<<<< HEAD
 @main.route('/user/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def view_user_profile(user_id):
@@ -204,7 +200,6 @@ def message_list():
     sent_messages = Message.query.filter_by(sender_id=current_user.id).all()
 
     return render_template('messages.html', received_messages=received_messages, sent_messages=sent_messages, form=form)
-=======
 
 
 
@@ -306,4 +301,3 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('home'))
->>>>>>> bf4b78e4a6b065271e2e5cf88d66e0ed3db5cb3f

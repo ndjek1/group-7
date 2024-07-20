@@ -21,19 +21,12 @@ class User(db.Model, UserMixin):
     experience = db.Column(db.String(200), nullable=True)
     additional_details = db.Column(db.String(200), nullable=True)
     password = db.Column(db.String(60), nullable=False)
-<<<<<<< HEAD
     
-    conversation_as_user1 = db.relationship('Conversation', foreign_keys='Conversation.user1_id', backref='user1', lazy=True)
-    conversation_as_user2 = db.relationship('Conversation', foreign_keys='Conversation.user2_id', backref='user2', lazy=True)
+    conversations_as_user1 = db.relationship('Conversation', foreign_keys='Conversation.user1_id', backref='user1_ref', lazy=True)
+    conversations_as_user2 = db.relationship('Conversation', foreign_keys='Conversation.user2_id', backref='user2_ref', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
-
-=======
-    posts = db.relationship('Post', backref='author', lazy=True)
-    comments = db.relationship('Comment', backref='author', lazy=True)
-    likes = db.relationship('Like', backref='user', lazy=True)
->>>>>>> bf4b78e4a6b065271e2e5cf88d66e0ed3db5cb3f
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,48 +35,44 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     image_file = db.Column(db.String(20), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-<<<<<<< HEAD
+
+    likes = db.relationship('Like', backref='post', lazy=True)
+    comments = db.relationship('Comment', backref='post', lazy=True)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
-
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_sent = db.Column(db.DateTime, default=datetime.utcnow)
-    conversation_id = db.Column(db.Integer, db.ForeignKey('conversation.id'), nullable=False)  # Fixed typo
+    conversation_id = db.Column(db.Integer, db.ForeignKey('conversation.id'), nullable=False)
 
     def __repr__(self):
-        return f"Message('{self.content}', '{self.date_sent}')"  # Fixed attribute names
-
+        return f"Message('{self.content}', '{self.date_sent}')"
 
 class Conversation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user1_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user2_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
     messages = db.relationship('Message', backref='conversation', lazy=True)
 
     def __repr__(self):
         return f"Conversation('{self.id}', '{self.user1_id}', '{self.user2_id}')"
-=======
-    user = db.relationship('User', backref=db.backref('user_posts', lazy=True))
-    likes = db.relationship('Like', backref='post', lazy=True)
-    comments = db.relationship('Comment', backref='post', lazy=True)
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for non-authenticated users
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    ip_address = db.Column(db.String(45), nullable=True)  # To store IP address of the liker
+    ip_address = db.Column(db.String(45), nullable=True)
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for non-authenticated users
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user = db.relationship('User', backref=db.backref('user_cmnt', lazy=True))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    author_name = db.Column(db.String(50), nullable=True)  # To store author name for non-authenticated users
->>>>>>> bf4b78e4a6b065271e2e5cf88d66e0ed3db5cb3f
+    author_name = db.Column(db.String(50), nullable=True)

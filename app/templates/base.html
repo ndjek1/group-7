@@ -20,6 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#latest-news">News</a>
                     </li>
@@ -37,9 +41,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#stories">Stories</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.opportunities') }}">Opportunities</a></li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.profile') }}">Profile</a>
                     </li>
@@ -51,10 +54,6 @@
                     </li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#latest-news">News</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#upcoming-events">Events</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#stories">Stories</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.opportunities') }}">Opportunities</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
                     {% endif %}
@@ -62,6 +61,9 @@
             </div>
         </div>
     </nav>
+    <div class="container-ticker">
+        <p class="ticker-text">WELCOME TO ALUMINA - CONNECTING ALUMNI - DISCOVER OPPORTUNITIES - STAY INFORMED!!! 🎓🌟🔍📰-</p>
+    </div>
 
     <div class="container mt-5 pt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}

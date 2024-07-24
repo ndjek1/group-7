@@ -19,13 +19,28 @@ import os
 
 from app.models import Comment, Like, Post
 
+from app import db, socketio
+from flask_socketio import emit, join_room, leave_room # type: ignore
+
 main = Blueprint('main', __name__)
 
 @main.route("/")
 @main.route("/home")
 def home():
-    posts = Post.query.limit(4).all()
-    return render_template('home.html', posts = posts)
+    posts = Post.query.filter_by(category='post').all()
+    news = Post.query.filter_by(category='news').all()
+    events = Post.query.filter_by(category='event').all()
+    return render_template('home.html', posts = posts, news = news, events = events)
+
+
+@main.route("/admin")
+def admin():
+    posts = Post.query.filter_by(category='post').all()
+    news = Post.query.filter_by(category='news').all()
+    events = Post.query.filter_by(category='event').all()
+    if current_user.is_authenticated:
+        return render_template('admin.html', posts = posts, news = news, events = events)
+    return redirect(url_for('auth.adminLogin'))
 
 @main.route("/all_posts", methods=['GET', 'POST'])
 def posts():
@@ -211,20 +226,20 @@ def save_post_picture(form_picture):
     form_picture.save(picture_path)
     return picture_fn
 
-@main.route("/post/new", methods=['GET', 'POST'])
+@main.route("/admin/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
         if form.image_file.data:
             image_file = save_post_picture(form.image_file.data)
-            post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id,user= current_user, image_file=image_file)
+            post = Post(title=form.title.data, content=form.content.data,link = form.link.data,category = form.category.data, user_id=current_user.id, image_file=image_file)
         else:
-            post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id, user = current_user)
+            post = Post(title=form.title.data, content=form.content.data,link= form.link.data,category = form.category.data, user_id=current_user.id, user = current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.admin'))
     return render_template('create_post.html', title='New Post', form=form)
 
 @main.route("/post/<int:post_id>", methods=['GET', 'POST'])
@@ -301,3 +316,22 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('home'))
+
+
+# SocketIO Events
+@socketio.on('send_message')
+def handle_send_message(data):
+    message = Message(content=data['message'], sender_id=data['sender_id'], conversation_id=data['conversation_id'])
+    db.session.add(message)
+    db.session.commit()
+    data['timestamp'] = message.date_sent.strftime('%Y-%m-%d %H:%M:%S')
+    emit('receive_message', data, room=data['conversation_id'])
+
+@socketio.on('join')
+def handle_join(data):
+    join_room(data['conversation_id'])
+
+@socketio.on('leave')
+def handle_leave(data):
+    leave_room(data['conversation_id'])
+

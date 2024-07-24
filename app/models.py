@@ -21,12 +21,25 @@ class User(db.Model, UserMixin):
     experience = db.Column(db.String(200), nullable=True)
     additional_details = db.Column(db.String(200), nullable=True)
     password = db.Column(db.String(60), nullable=False)
-    
+    posts = db.relationship('Post', backref='author', lazy=True)
+    comments = db.relationship('Comment', backref='author', lazy=True)
+    likes = db.relationship('Like', backref='user', lazy=True)
+    user_posts = db.relationship('Post', foreign_keys='Post.user_id', overlaps="author,posts")
+    user_cmnt = db.relationship('Comment', foreign_keys='Comment.user_id', overlaps="author,comments")
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
+
     conversations_as_user1 = db.relationship('Conversation', foreign_keys='Conversation.user1_id', backref='user1_ref', lazy=True)
     conversations_as_user2 = db.relationship('Conversation', foreign_keys='Conversation.user2_id', backref='user2_ref', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+class Admin(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+    
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,9 +48,10 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     image_file = db.Column(db.String(20), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
     likes = db.relationship('Like', backref='post', lazy=True)
     comments = db.relationship('Comment', backref='post', lazy=True)
+    link = db.Column(db.String(255), nullable=True)
+    category = db.Column(db.String(25), nullable=True)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -72,7 +86,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    user = db.relationship('User', backref=db.backref('user_cmnt', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for non-authenticated users
+    user = db.relationship('User', foreign_keys=user_id, overlaps="author,comments")
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    author_name = db.Column(db.String(50), nullable=True)
+    author_name = db.Column(db.String(50), nullable=True)  # To store author name for non-authenticated users

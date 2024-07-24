@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Alumina{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
+                <img src="{{ url_for('static', filename='images/alumni copy.png') }}" alt="Alumina Logo">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#latest-news">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upcoming-events">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stories">Stories</a>
+                    </li>
+          
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('main.user_list')}}">Users</a>
+                    </li>
+                    
+                    
+                   
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Posts
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li >
+                            <a class="dropdown-item" href="{{ url_for('main.new_post') }}">New post</a>
+                        </li>
+                        <li >
+                            <a class="dropdown-item" href="{{ url_for('main.posts') }}">All posts</a>
+                        </li>
+                          
+                        </ul>
+                      </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-ticker">
+        <p class="ticker-text">WELCOME TO ALUMINA - CONNECTING ALUMNI - DISCOVER OPPORTUNITIES - STAY INFORMED!!! 🎓🌟🔍📰-</p>
+    </div>
+
+    <div class="container mt-5 pt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+      
+ <!-- Hero Section -->
+ <section class="hero">
+  <div class="container " style="text-align: center;" >
+      <h2>Welcome to the Alumina Engagement Platform</h2>
+      <p>Connecting Alumni Worldwide</p>
+  </div>
+</section>
+
+
+
+<!-- Alumni Success Stories -->
+<section class="success-stories" id="post">
+<div class="container">
+    <h2>Upcoming events</h2>
+    
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for item in events%}
+      <div class="col">
+        <div class="card h-100">
+          <img src="{{ url_for('static', filename='post_pics/' + item.image_file) }}" class="card-img-top" alt="..." style="width: 100%; height: 200px; object-fit: cover;">
+          <div class="card-body">
+            <h5 class="card-title">{{item.title}}</h5>
+            <p class="card-text">{{item.content}}</p>
+            <a href="#" class="btn btn-primary">Register</a>
+          </div>
+          
+        </div>
+        
+      </div>
+      {% endfor %}
+    </div>
+</div>
+</section>
+
+<!-- Alumni Success Stories -->
+<section class="success-stories" id="post">
+  <div class="container">
+      <h2>Latest news</h2>
+      <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for item in news%}
+        <div class="col">
+          <div class="card h-100">
+            <img src="{{ url_for('static', filename='post_pics/' + item.image_file) }}" class="card-img-top" alt="..." style="width: 100%;height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">{{item.title}}</h5>
+              <p class="card-text">{{item.content}}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <a href="{{url_for('main.posts')}}" class="btn btn-primary m">View all posts</a>
+  </div>
+  </section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+      <p>Contact us: info@aluminaengagement.com</p>
+      <ul class="social-links">
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">LinkedIn</a></li>
+      </ul>
+  </div>
+</footer>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

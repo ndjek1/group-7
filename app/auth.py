@@ -1,15 +1,14 @@
 # app/auth.py
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app import db, bcrypt
-from app.forms import RegistrationForm, LoginForm
-from app.models import User
+from app.forms import AdminLoginForm, AdminRegistrationForm, RegistrationForm, LoginForm
+from app.models import Admin, User
 from flask_login import login_user, current_user, logout_user, login_required
 
 auth = Blueprint('auth', __name__)
-
 @auth.route("/register", methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and isinstance(current_user, User):
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -33,6 +32,39 @@ def register():
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('auth.login'))
     return render_template('register.html', title='Register', form=form)
+
+@auth.route("/admin/register", methods=['GET', 'POST'])
+def registerAdmin():
+    if current_user.is_authenticated and isinstance(current_user, Admin):
+        return redirect(url_for('main.admin'))
+    form = AdminRegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        admin = Admin(
+            username=form.username.data, 
+            email=form.email.data, 
+            password=hashed_password,
+        )
+        db.session.add(admin)
+        db.session.commit()
+        flash('Your admin account has been created! You are now able to log in', 'success')
+        return redirect(url_for('auth.adminLogin'))
+    return render_template('admin_register.html', title='Admin Register', form=form)
+
+@auth.route("/admin/login", methods=['GET', 'POST'])
+def adminLogin():
+    if current_user.is_authenticated and isinstance(current_user, Admin):
+        return redirect(url_for('main.admin'))
+    form = AdminLoginForm()
+    if form.validate_on_submit():
+        admin = Admin.query.filter_by(email=form.email.data).first()
+        if admin and bcrypt.check_password_hash(admin.password, form.password.data):
+            login_user(admin, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.admin'))
+        else:
+            flash('Login Unsuccessful. Please check email and password', 'danger')
+    return render_template('admin_login.html', title='Admin Login', form=form)
 
 
 @auth.route("/login", methods=['GET', 'POST'])

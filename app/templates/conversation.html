@@ -1,27 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Conversation with {{ user2.first_name }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <h1>Conversation with {{ user2.first_name }}</h1>
 
-    <div class="messages">
-        {% for message in messages %}
-            <div class="message {% if message.sender_id == current_user.id %}you{% endif %}">
-                <strong>{{ message.sender_id == current_user.id and 'You' or user1.first_name }}:</strong> 
-                {{ message.content }} <em>({{ message.date_sent }})</em>
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/message.css')}}">
+<div class="container bootstrap snippets bootdeys">
+    <div class="col-md-7 col-xs-12 col-md-offset-2">
+      <!-- Panel Chat -->
+      <div class="panel" id="chat">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="icon wb-chat-text" aria-hidden="true"></i> {{user2.username}}
+          </h3>
+        </div>
+        <div class="panel-body">
+          <div class="chats" id="messages">
+            {% for message in messages %}
+              {% if message.sender_id == current_user.id %}
+            <div class="chat">
+              <div class="chat-body">
+                <div class="chat-content">
+                  <p class="text">
+                    {{ message.content }}
+                  </p>
+                  <time class="chat-time time" datetime="2015-07-01T11:37">{{ message.date_sent.strftime('%Y-%m-%d %H:%M:%S') }}</time>
+                </div>
+              </div>
             </div>
-        {% endfor %}
+            {% else %}
+            <div class="chat chat-left">
+              <div class="chat-body">
+                <div class="chat-content">
+                  <p class="text">{{ message.content }}</p>
+                  <time class="chat-time time" datetime="2015-07-01T11:39">{{ message.date_sent.strftime('%Y-%m-%d %H:%M:%S') }}</time>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        <div class="panel-footer">
+          <form id="messageForm">
+            <div class="input-group">
+              <input type="text" id="messageInput" class="form-control" placeholder="Say something">
+              <span class="input-group-btn"> 
+                <button class="btn btn-primary" type="submit">Send</button>
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- End Panel Chat -->
     </div>
+</div>
 
-    <form method="POST" action="{{ url_for('conversations.view_conversation', conversation_id=conversation.id) }}">
-        {{ form.hidden_tag() }}
-        <label for="content">Message:</label>
-        {{ form.content(class="form-control", required=True) }}
-        <button type="submit" class="btn btn-primary">Send</button>
-    </form>
-</body>
-</html>
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    var socket = io();
+    var conversationId = {{ conversation.id }};
+    var senderId = {{ current_user.id }};
+    var senderUsername = "{{ current_user.username }}";
+    var senderImageFile = "{{ current_user.image_file }}";
+
+    socket.emit('join', {'conversation_id': conversationId});
+
+    document.getElementById('messageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var message = document.getElementById('messageInput').value;
+        
+        // Emit the message to the server
+        socket.emit('send_message', {
+            'message': message,
+            'sender_id': senderId,
+            'conversation_id': conversationId
+        });
+        
+        // Clear the input field
+        document.getElementById('messageInput').value = '';
+    });
+
+    socket.on('receive_message', function(data) {
+        if (data.conversation_id == conversationId) {
+            var messages = document.getElementById('messages');
+            var messageElement = document.createElement('div');
+            if (data.sender_id == senderId) {
+                messageElement.classList.add('chat');
+                messageElement.innerHTML = `
+                    <div class="chat-body">
+                        <div class="chat-content">
+                          <p class="text">${data.message}</p>
+                          <time class="chat-time time" datetime="${data.timestamp}">${data.timestamp}</time>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageElement.classList.add('chat', 'chat-left');
+                messageElement.innerHTML = `
+                    <div class="chat-body">
+                        <div class="chat-content">
+                          <p class="text">${data.message}</p>
+                          <time class="chat-time time" datetime="${data.timestamp}">${data.timestamp}</time>
+                        </div>
+                    </div>
+                `;
+            }
+            messages.appendChild(messageElement);
+            messages.scrollBottom = messages.scrollHeight;
+        }
+    });
+
+    window.addEventListener('beforeunload', function() {
+        socket.emit('leave', {'conversation_id': conversationId});
+    });
+</script>
+
+{% endblock %}

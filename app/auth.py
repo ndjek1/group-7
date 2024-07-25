@@ -1,9 +1,9 @@
 # app/auth.py
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request # type: ignore
 from app import db, bcrypt
 from app.forms import AdminLoginForm, AdminRegistrationForm, RegistrationForm, LoginForm
 from app.models import Admin, User
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import login_user, current_user, logout_user, login_required # type: ignore
 
 auth = Blueprint('auth', __name__)
 @auth.route("/register", methods=['GET', 'POST'])

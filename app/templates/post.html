@@ -13,10 +13,10 @@
               <div class="post-content">
                 <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" alt="post-image" class="img-responsive post-image">
                 <div class="post-container">
-                  <img src="{{ url_for('static', filename='profile_pics/' + post.user.image_file) }}" alt="user" class="profile-photo-md pull-left">
+                  <img src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}" alt="user" class="profile-photo-md pull-left">
                   <div class="post-detail">
                     <div class="user-info">
-                      <h5><a href="timeline.html" class="profile-link">{{post.user.username}}</a> </h5>
+                      <h5><a href="{{ url_for('main.view_user_profile', user_id = post.author.id) }}" class="profile-link">{{post.author.username}}</a> </h5>
                       <p class="text-muted">Published on{{ post.date_posted.strftime('%Y-%m-%d') }}</p>
                     </div>
                     <div class="reaction">
@@ -31,7 +31,7 @@
                     {% for comment in comments %}
                     <div class="post-comment">
                       <img src="{{ url_for('static', filename='profile_pics/' + (comment.user.image_file if comment.user.is_authenticated else 'default.png')) }}" alt="" class="profile-photo-sm">
-                      <p><a href="timeline.html" class="profile-link">{{ comment.user.username if comment.user else comment.author_name }} </a><i class="em em-laughing"></i> {{ comment.content }} </p>
+                      <p><a href="{{ url_for('main.profile') }}" class="profile-link">{{ comment.user.username if comment.user else comment.author_name }} </a><i class="em em-laughing"></i> {{ comment.content }} </p>
                     </div>
                    {% endfor %}
                     <div class="post-comment">

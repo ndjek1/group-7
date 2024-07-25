@@ -16,7 +16,7 @@
                     <h5 class="card-title">{{ post.title }}</h5>
                     <p class="card-text">{{ post.content }}</p>
                     <p class="card-text">
-                        <small class="text-muted">Posted on {{ post.date_posted.strftime('%Y-%m-%d') }} by {{ post.user.username }}</small>
+                        <small class="text-muted">Posted on {{ post.date_posted.strftime('%Y-%m-%d') }} by {{ post.author.username }}</small>
                     </p>
                     <div>
                         <a href="{{url_for('main.like_post', post_id=post.id) }}" class="btn btn-primary"> Like</a>

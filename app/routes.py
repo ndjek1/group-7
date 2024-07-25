@@ -1,20 +1,19 @@
-from flask import Blueprint, abort, flash, render_template, redirect, url_for, request, current_app
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
+from flask import Blueprint, abort, flash, render_template, redirect, url_for, request, current_app # type: ignore
+from flask_login import login_required, current_user # type: ignore
+from werkzeug.utils import secure_filename # type: ignore
 from app import db
 from app.forms import UpdateProfileForm, MessageForm
-from app.models import User, Conversation, Message
+from app.models import Follow, User, Conversation, Message
 
-from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app
+from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app # type: ignore
+from flask import Blueprint, flash, render_template, redirect, url_for, request, current_app # type: ignore
 
-from flask import Blueprint, flash, render_template, redirect, url_for, request, current_app
-
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
+from flask_login import login_required, current_user # type: ignore
+from werkzeug.utils import secure_filename # type: ignore
 from app import db
 import uuid
 from app.forms import AnonymousCommentForm, CommentForm, LikeForm, PostForm, UpdateProfileForm
-from sqlalchemy.orm import joinedload
+from flask import jsonify
 import os
 
 from app.models import Comment, Like, Post
@@ -30,7 +29,10 @@ def home():
     posts = Post.query.filter_by(category='post').all()
     news = Post.query.filter_by(category='news').all()
     events = Post.query.filter_by(category='event').all()
-    return render_template('home.html', posts = posts, news = news, events = events)
+    likes = []
+    if current_user.is_authenticated:
+        likes = [like.post_id for like in Like.query.filter_by(user_id=current_user.id).all()]
+    return render_template('home.html', posts = posts, news = news, events = events, likes = likes)
 
 
 @main.route("/admin")
@@ -110,6 +112,8 @@ def save_picture(form_picture):
 @login_required
 def view_user_profile(user_id):
     user = User.query.get_or_404(user_id)
+    is_current_user = (user_id == current_user.id)
+    is_following = Follow.query.filter_by(follower_id=current_user.id, followee_id=user.id).first() is not None
     form = MessageForm()
 
     if form.validate_on_submit():
@@ -121,8 +125,7 @@ def view_user_profile(user_id):
         flash('Message sent!', 'success')
         return redirect(url_for('main.view_user_profile', user_id=user_id))
 
-    is_current_user = (current_user.id == user_id)
-    return render_template('profile.html', user=user, is_current_user=is_current_user, form=form)
+    return render_template('profile.html', user=user, is_current_user=is_current_user, form=form, is_following = is_following)
 
 conversations = Blueprint('conversations', __name__)
 
@@ -164,6 +167,7 @@ def conversations_list():
     conversations = Conversation.query.filter(
         (Conversation.user1_id == user.id) | (Conversation.user2_id == user.id)
     ).all()
+    followed_users = [follow.followee for follow in user.following]
 
     # Ensure user2 is defined correctly
     for conversation in conversations:
@@ -175,7 +179,7 @@ def conversations_list():
             conversation.user1_id = user.id
             conversation.user2_id = conversation.user2.id
 
-    return render_template('conversations_list.html', conversations=conversations)
+    return render_template('conversations_list.html', conversations=conversations, followed_users = followed_users)
 
 
 @conversations.route("/start_conversation/<int:user_id>", methods=['GET', 'POST'])
@@ -263,7 +267,7 @@ def post(post_id):
 
     return render_template('post.html', title=post.title, post=post, comments=comments, form=form)
 
-@main.route("/like/<int:post_id>", methods=['GET','POST'])
+@main.route("/like/<int:post_id>", methods=['POST','GET'])
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     ip_address = request.remote_addr
@@ -284,7 +288,7 @@ def like_post(post_id):
             db.session.add(new_like)
 
     db.session.commit()
-    return redirect(url_for('main.posts'))
+    return jsonify(success=True)
 
 
 
@@ -335,3 +339,37 @@ def handle_join(data):
 def handle_leave(data):
     leave_room(data['conversation_id'])
 
+
+
+@main.route('/follow/<int:followee_id>', methods=['POST'])
+@login_required
+def follow_user(followee_id):
+    follower_id = current_user.id
+    if follower_id == followee_id:
+        flash('You cannot follow yourself.', 'warning')
+        return redirect(url_for('main.profile', user_id=followee_id))
+    
+    follow = Follow.query.filter_by(follower_id=follower_id, followee_id=followee_id).first()
+    if not follow:
+        new_follow = Follow(follower_id=follower_id, followee_id=followee_id)
+        db.session.add(new_follow)
+        db.session.commit()
+        flash('You are now following this user.', 'success')
+    else:
+        flash('You are already following this user.', 'info')
+    
+    return redirect(url_for('main.view_user_profile', user_id=followee_id))
+
+@main.route('/unfollow/<int:followee_id>', methods=['POST'])
+@login_required
+def unfollow_user(followee_id):
+    follower_id = current_user.id
+    follow = Follow.query.filter_by(follower_id=follower_id, followee_id=followee_id).first()
+    if follow:
+        db.session.delete(follow)
+        db.session.commit()
+        flash('You have unfollowed this user.', 'success')
+    else:
+        flash('You are not following this user.', 'info')
+    
+    return redirect(url_for('main.view_user_profile', user_id=followee_id))

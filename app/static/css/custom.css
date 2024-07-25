@@ -180,9 +180,7 @@ footer .social-links li a {
     margin-bottom: auto;
 }
 
-.card-body .btn {
-    margin-top: auto;
-}
+
 
 
 .navbar-nav .nav-link {
@@ -239,14 +237,7 @@ footer .social-links li a {
     color: #6c757d;
 }
 
-.btn-primary {
-    background-color: #28a745;
-    border: none;
-}
 
-.btn-primary:hover {
-    background-color: #218838;
-}
 
 
 .custom-img {
@@ -326,3 +317,23 @@ footer .social-links li a {
   .navbar-nav .nav-link:hover {
     color: #dd573c; /* Set the link hover color */
   }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-30px);
+    }
+    60% {
+        transform: translateY(-15px);
+    }
+}
+
+.smiley {
+    position: absolute;
+    font-size: 3rem;
+    animation: bounce 1s;
+    opacity: 1;
+    transition: opacity 1ms;
+}

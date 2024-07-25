@@ -1,9 +1,10 @@
-from flask_socketio import SocketIO
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, current_user
-from flask_migrate import Migrate
+from flask_socketio import SocketIO # type: ignore
+from flask import Flask # type: ignore
+from flask_sqlalchemy import SQLAlchemy # type: ignore
+from flask_bcrypt import Bcrypt # type: ignore
+from flask_login import LoginManager, current_user # type: ignore
+from flask_migrate import Migrate # type: ignore
+from flask_wtf.csrf import CSRFProtect
 
 socketio = SocketIO()
 
@@ -19,6 +20,7 @@ def create_app():
     app.config['SECRET_KEY'] = '2607/favy'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
     app.config['DEBUG'] = True  
+    csrf = CSRFProtect(app)
     socketio.init_app(app)
     db.init_app(app)
     bcrypt.init_app(app)

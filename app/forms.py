@@ -1,17 +1,20 @@
 # app/forms.py
-from flask_wtf import FlaskForm
-from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
-from wtforms import FileField, IntegerField,TextAreaField, StringField, PasswordField, SubmitField, BooleanField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
+from flask_wtf import FlaskForm # type: ignore
+from wtforms import FileField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField # type: ignore
+from wtforms import FileField, IntegerField,TextAreaField, StringField, PasswordField, SubmitField, BooleanField, SelectField # type: ignore
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional # type: ignore
 from app.models import User
-from flask_wtf.file import FileAllowed
+from flask_wtf.file import FileAllowed # type: ignore
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    
+    role = SelectField('Role', choices=[
+        ('mentor', 'Mentor'),
+        ('mentee', 'Mentee')
+    ], validators=[DataRequired()])
     # New fields
     first_name = StringField('First Name', validators=[Optional(), Length(max=30)])
     last_name = StringField('Last Name', validators=[Optional(), Length(max=30)])

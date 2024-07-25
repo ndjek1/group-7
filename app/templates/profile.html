@@ -102,14 +102,31 @@
                         <label class="labels">State/Region</label>
                         <p>{{ user.state }}</p>
                     </div>
-                    <a href="{{url_for('conversations.start_conversation', user_id=user.id)}}">
-                        <button type="submit" class="btn btn-primary">Send Message</button></a>
+                    <div class="col-md-12">
+                      
+                        {% if current_user.is_authenticated and current_user.id != user.id %}
+                        {% if is_following %}
+                            <form action="{{ url_for('main.unfollow_user', followee_id=user.id) }}" method="post">
+                                {{ form.hidden_tag() }}
+                                <button type="submit" class="btn btn-danger">Unfollow</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('main.follow_user', followee_id=user.id) }}" method="post">
+                                {{ form.hidden_tag() }}
+                                <button type="submit" class="btn btn-primary">Follow</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                    <div class="col-md-12">
+                        <a href="{{ url_for('conversations.start_conversation', user_id=user.id) }}">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </a>
+                    </div>
                 </div>
-
                 {% endif %}
             </div>
         </div>
-        
     </div>
 </div>
 {% endblock %}

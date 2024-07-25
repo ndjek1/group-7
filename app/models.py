@@ -1,6 +1,6 @@
 from datetime import datetime
 from app import db, login_manager
-from flask_login import UserMixin
+from flask_login import UserMixin # type: ignore
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    role = db.Column(db.String(120), unique=False, nullable=True, default='mentee')
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     first_name = db.Column(db.String(30), nullable=True)
     last_name = db.Column(db.String(30), nullable=True)
@@ -31,8 +32,19 @@ class User(db.Model, UserMixin):
     conversations_as_user1 = db.relationship('Conversation', foreign_keys='Conversation.user1_id', backref='user1_ref', lazy=True)
     conversations_as_user2 = db.relationship('Conversation', foreign_keys='Conversation.user2_id', backref='user2_ref', lazy=True)
 
+    followers = db.relationship('Follow', backref='followee', foreign_keys='Follow.followee_id', lazy=True)
+    following = db.relationship('Follow', backref='follower', foreign_keys='Follow.follower_id', lazy=True)
+
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+class Follow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    followee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Ensuring that the same follower cannot follow the same followee more than once
+    __table_args__ = (db.UniqueConstraint('follower_id', 'followee_id', name='unique_follow'),)
 
 class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

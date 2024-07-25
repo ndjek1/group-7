@@ -7,68 +7,56 @@ Conversations
 {% endblock %}
 
 {% block content %}
-<h2>Conversations</h2>
-<style>
-    /* Container styling */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
 
-/* Header styling */
-h2 {
-    font-size: 2rem;
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-}
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/messages.css')}}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container mt-5">
+    <div class="row">
+        {% for followed_user in followed_users %}
+            <div class="col-md-3 mb-4">
+                <div class="card text-center" style="width: 120px; height: 120px; display: flex; justify-content: center; align-items: center;">
+                    <img src="{{ url_for('static', filename='profile_pics/' + followed_user.image_file) }}" class="card-img-top rounded-circle" alt="{{ followed_user.username }}" style="width: 100px; height: 100px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ followed_user.username }}</h5>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 
-/* List styling */
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* List item styling */
-ul li {
-    margin-bottom: 10px;
-}
-
-ul li a {
-    display: block;
-    padding: 15px 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #333;
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-ul li a:hover {
-    background-color: #f0f0f0;
-    border-color: #ccc;
-}
-
-/* Active list item styling */
-ul li a:active {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
-}
-
-</style>
-<ul>
-    {% for conversation in conversations %}
-        <li>
-            <a href="{{ url_for('conversations.view_conversation',conversation_id=conversation.id) }}">
-            conversation with {{ conversation.user2.username }}
+<div class="row bootstrap snippets bootdeys">
+    <div class="col-md-6 col-xs-12 col-md-offset-3">
+      <div class="panel" id="messge">
+        <div class="panel-heading">
+          <h3 class="panel-title">Message</h3>
+        </div>
+        <div class="panel-body">
+          <ul class="list-group list-group-full">
+            {% for conversation in conversations %}
+            <a href="{{ url_for('conversations.view_conversation', conversation_id=conversation.id) }}" class="list-group-item list-group-item-action">
+            <li class="list-group-item">
+              <div class="media">
+                <div class="media-left">
+                  <span class="avatar avatar-online">
+                    <img src="{{ url_for('static', filename='post_pics/' + conversation.user2.image_file) }}" alt="">
+                    <i></i>
+                  </span>
+                </div>
+                <div class="media-body">
+                  <h5 class="list-group-item-heading">
+                    <small class="pull-right">3 days ago</small>
+                    {{ conversation.user2.username if conversation.user1_id == current_user.id else conversation.user1.username }}
+                  </h5>
+                  <p class="list-group-item-text">Cogitemus tempora tibique probabo...</p>
+                </div>
+              </div>
+            </li>
             </a>
-        </li>
-    {% endfor %}
-</ul>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+</div>
 {% endblock %}

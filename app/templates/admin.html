@@ -94,11 +94,17 @@
       {% for item in events%}
       <div class="col">
         <div class="card h-100">
+          {% if item.image_file %}
           <img src="{{ url_for('static', filename='post_pics/' + item.image_file) }}" class="card-img-top" alt="..." style="width: 100%; height: 200px; object-fit: cover;">
+      {% else %}
+          <img src="{{ url_for('static', filename='default_image.jpg') }}" class="card-img-top" alt="..." style="width: 100%; height: 200px; object-fit: cover;">
+      {% endif %}
+      
           <div class="card-body">
             <h5 class="card-title">{{item.title}}</h5>
             <p class="card-text">{{item.content}}</p>
-            <a href="#" class="btn btn-primary">Register</a>
+            <a href="{{ url_for('main.update_post', post_id = item.id) }}" class="btn btn-primary mb-2">Edit</a>
+            <a href="{{ url_for('main.delete_post', post_id = item.id) }}" class="btn btn-danger">Delete</a>
           </div>
           
         </div>
@@ -121,6 +127,8 @@
             <div class="card-body">
               <h5 class="card-title">{{item.title}}</h5>
               <p class="card-text">{{item.content}}</p>
+              <a href="{{ url_for('main.update_post', post_id = item.id) }}" class="btn btn-primary mb-2">Edit</a>
+            <a href="{{ url_for('main.delete_post', post_id = item.id) }}" class="btn btn-danger">Delete</a>
             </div>
           </div>
         </div>
@@ -129,6 +137,38 @@
       <a href="{{url_for('main.posts')}}" class="btn btn-primary m">View all posts</a>
   </div>
   </section>
+
+  <!-- Alumni Success Stories -->
+<section class="success-stories" id="post">
+  <div class="container">
+      <h2>Registration for event</h2>
+
+      <div class="row row-cols-1 row-cols-md-4 g-4">
+        <table class="table table-bordered border-primary">
+          <thead>
+              <tr>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Event Name</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for registration in event_registrations %}
+              <tr>
+                  <td>{{ registration.full_name }}</td>
+                  <td>{{ registration.email }}</td>
+                  <td>{{ registration.event_name }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+        
+        
+      </div>
+     
+  </div>
+  </section>
+
 
 <!-- Footer -->
 <footer>

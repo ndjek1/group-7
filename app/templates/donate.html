@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+
+.card {
+    max-width: 500px;
+    margin: auto;
+    color: black;
+    border-radius: 20 px;
+}
+
+p {
+    margin: 0px;
+}
+
+.container .h8 {
+    font-size: 30px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.btn.btn-primary {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background-image: linear-gradient(to right, #77A1D3 0%, #79CBCA 51%, #77A1D3 100%);
+    border: none;
+    transition: 0.5s;
+    background-size: 200% auto;
+
+}
+
+
+.btn.btn.btn-primary:hover {
+    background-position: right center;
+    color: #fff;
+    text-decoration: none;
+}
+
+
+
+.btn.btn-primary:hover .fas.fa-arrow-right {
+    transform: translate(15px);
+    transition: transform 0.2s ease-in;
+}
+
+.form-control {
+    color: white;
+    background-color: #223C60;
+    border: 2px solid transparent;
+    height: 60px;
+    padding-left: 20px;
+    vertical-align: middle;
+}
+
+.form-control:focus {
+    color: white;
+    background-color: #0C4160;
+    border: 2px solid #2d4dda;
+    box-shadow: none;
+}
+
+.text {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+::placeholder {
+    font-size: 14px;
+    font-weight: 600;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <!-- Message Column -->
+        <div class="col-md-6">
+            <div class="content-section">
+                <h2>Support Our Cause</h2>
+                <p>Your donation helps us continue our mission. Please choose a payment method and enter the required information to proceed with your donation. We appreciate your support!</p>
+                <p>Strengthen our mentorship program with your support.</p>
+                   <p>Fund alumni scholarships and create brighter futures.</p> 
+                    <p>Expand career services for our alumni. Donate today.</p>
+            </div>
+           
+            
+        </div>
+
+        <!-- Donation Form Column -->
+        <div class="col-md-6">
+            <div class="content-section">
+
+                <form method="POST" action="{{ url_for('main.donate') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Donate</legend>
+                        
+                        <div class="col-12">
+                            <div class="d-flex flex-column">
+                                <p class="text mb-1">Amount</p>
+                                <input class="form-control mb-3" type="text" placeholder="Amount" name="card_name">
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Payment Methods" style="margin-bottom: 15px;">
+                            <button type="button" class="btn btn-outline-info payment-method-btn" data-method="visa">Visa</button>
+                            <button type="button" class="btn btn-outline-info payment-method-btn" data-method="mobile_money">Mobile Money</button>
+                            <button type="button" class="btn btn-outline-info payment-method-btn" data-method="airtel_money">Airtel Money</button>
+                        </div>
+                        <div class="form-group" id="phone-number-group" style="display: none;">
+                            <p>Number</p> 
+                            <input type="text" id="phone-number" name="phone_number" class="form-control mb-3">
+                            <div class="col-12">
+                                <div class="btn btn-primary mb-3">
+                                    <span class="ps-3">Donate</span>
+                                    <span class="fas fa-arrow-right"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="visa-info-group" style="display: none;">
+                            <div class="container p-0">
+                                <div class="card px-4">
+                                    <p class="h8 py-3">Payment Details</p>
+                                    <div class="row gx-3">
+                                        <div class="col-12">
+                                            <div class="d-flex flex-column">
+                                                <p class="text mb-1">Person Name</p>
+                                                <input class="form-control mb-3" type="text" placeholder="Name" name="card_name">
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex flex-column">
+                                                <p class="text mb-1">Card Number</p>
+                                                <input class="form-control mb-3" type="text" placeholder="1234 5678 435678" name="card_number">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex flex-column">
+                                                <p class="text mb-1">Expiry</p>
+                                                <input class="form-control mb-3" type="text" placeholder="MM/YYYY" name="expiry_date">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex flex-column">
+                                                <p class="text mb-1">CVV/CVC</p>
+                                                <input class="form-control mb-3 pt-2" type="password" placeholder="***" name="cvv">
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="btn btn-primary mb-3">
+                                                <span class="ps-3">Donate</span>
+                                                <span class="fas fa-arrow-right"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                   
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const paymentMethodButtons = document.querySelectorAll(".payment-method-btn");
+        const phoneNumberGroup = document.getElementById("phone-number-group");
+        const visaInfoGroup = document.getElementById("visa-info-group");
+
+        paymentMethodButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                const method = this.getAttribute("data-method");
+                if (method === "mobile_money" || method === "airtel_money") {
+                    phoneNumberGroup.style.display = "block";
+                    visaInfoGroup.style.display = "none";
+                } else if (method === "visa") {
+                    phoneNumberGroup.style.display = "none";
+                    visaInfoGroup.style.display = "block";
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+
+<footer>
+    <div class="container">
+        <p>Contact us: info@aluminaengagement.com</p>
+        <ul class="social-links">
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">LinkedIn</a></li>
+        </ul>
+    </div>
+</footer>

@@ -16,12 +16,12 @@
                   <img src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}" alt="user" class="profile-photo-md pull-left">
                   <div class="post-detail">
                     <div class="user-info">
-                      <h5><a href="{{ url_for('main.view_user_profile', user_id = post.author.id) }}" class="profile-link">{{post.author.username}}</a> </h5>
-                      <p class="text-muted">Published on{{ post.date_posted.strftime('%Y-%m-%d') }}</p>
+                      <h5><a href="{{ url_for('main.view_user_profile', user_id = post.author.id) }}" class="profile-link">{{post.title}}</a> </h5>
+                      <p class="text-muted">Published on {{ post.date_posted.strftime('%Y-%m-%d') }}</p>
                     </div>
                     <div class="reaction">
-                      <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{ post.likes | length }}</a>
-                      <a class="btn text-red"><i class="fa fa-comment"></i> {{ post.comments | length }}</a>
+                      <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{ post.likes | length }} likes</a>
+                      <a class="btn text-red"><i class="fa fa-comment"></i> {{ post.comments | length }} comments</a>
                     </div>
                     <div class="line-divider"></div>
                     <div class="post-text">
@@ -31,29 +31,24 @@
                     {% for comment in comments %}
                     <div class="post-comment">
                       <img src="{{ url_for('static', filename='profile_pics/' + (comment.user.image_file if comment.user.is_authenticated else 'default.png')) }}" alt="" class="profile-photo-sm">
-                      <p><a href="{{ url_for('main.profile') }}" class="profile-link">{{ comment.user.username if comment.user else comment.author_name }} </a><i class="em em-laughing"></i> {{ comment.content }} </p>
+                      <p><a href="{{ url_for('main.view_user_profile', user_id = comment.user.id) }}" class="profile-link">{{ comment.user.username if comment.user else comment.author_name }} </a><i class="em em-laughing"></i> {{ comment.content }} </p>
                     </div>
                    {% endfor %}
                     <div class="post-comment">
                       {% if current_user.is_authenticated %}
                       <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file)  }}" alt="" class="profile-photo-sm">
-                      {% else %}
-                      <img src="{{ url_for('static', filename='profile_pics/default.png')  }}" alt="" class="profile-photo-sm">
                       {% endif %}
                       <form method="POST" action="{{ url_for('main.post', post_id=post.id) }}">
                           {{ form.hidden_tag() }}
-                          {% if not current_user.is_authenticated %}
+                          {% if current_user.is_authenticated %}
                               <div class="form-group">
-                                  {{ form.name(class="form-control form-control-lg") }}
+                                  {{ form.content(class="form-control form-control-lg") }}
                               </div>
-                          {% else %}
-                          <div class="form-group">
-                              {{ form.content(class="form-control form-control-lg") }}
-                          </div>
+                              <div class="form-group">
+                                {{ form.submit(class="btn btn-outline-info") }}
+                            </div>
                           {% endif%}
-                          <div class="form-group">
-                              {{ form.submit(class="btn btn-outline-info") }}
-                          </div>
+                          
                       </form>
                     </div>
                   </div>

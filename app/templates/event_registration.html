@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Event registration{% endblock %}
+{% block content %}
+<div class="container mt-5" style="margin-top: 30px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Register</h2>
+                    <form method="POST" action="{{ url_for('main.register_for_event', event_id = event_id) }}">
+                        {{ form.hidden_tag() }}
+                        <fieldset class="form-group">
+                            <div class="form-group">
+                                {{ form.full_name.label(class="form-control-label") }}
+                                {{ form.full_name(class="form-control form-control-lg") }}
+                                {% if form.full_name.errors %}
+                                    <div class="alert alert-danger">
+                                        {% for error in form.full_name.errors %}
+                                            <span>{{ error }}</span><br>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.email.label(class="form-control-label") }}
+                                {{ form.email(class="form-control form-control-lg") }}
+                                {% if form.email.errors %}
+                                    <div class="alert alert-danger">
+                                        {% for error in form.email.errors %}
+                                            <span>{{ error }}</span><br>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            
+                        </fieldset>
+                        <div class="form-group text-center">
+                            {{ form.submit(class="btn btn-outline-info btn-lg") }}
+                        </div>
+                    </form>
+                    <div class="border-top pt-3 text-center">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

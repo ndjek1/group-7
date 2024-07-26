@@ -60,6 +60,13 @@
 </section>
 
 <!-- Featured Events -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
 <section class="events" id="upcoming-events">
   <div class="container">
       <h2>Upcoming Events</h2>
@@ -72,10 +79,11 @@
                       <p>Date: November 5, 2024</p>
                       <p>Location: University Alumni Hall</p>
                       <p>{{ event.content }}</p>
-                      <a href="#" class="btn btn-primary">Find Out More</a>
+                     
                   </div>
                   <div class="card-footer">
                     <button class="btn like-btn {% if event.id in likes %}btn-primary{% else %}btn-secondary{% endif %}" data-post-id="{{ event.id }}" style="float: left;">Like</button>
+                    <a href="{{ url_for('main.register_for_event', event_id = event.id) }}" class="btn btn-primary">Register</a>
                       <a href="{{ url_for('main.post', post_id=event.id) }}" class="btn btn-secondary" style="float: right;">Comment</a>
                   </div>
               </div>
@@ -102,7 +110,11 @@
               <p>
                   {{ news.content }}.
               </p>
-            <a href="#" class="btn btn-primary">Find Out More</a>
+          </div>
+          <div class="card-footer">
+            <button class="btn like-btn {% if news.id in likes %}btn-primary{% else %}btn-secondary{% endif %}" data-post-id="{{ news.id }}" style="float: left;">Like</button>
+            
+              <a href="{{ url_for('main.post', post_id=news.id) }}" class="btn btn-secondary" style="float: right;">Comment</a>
           </div>
         </div>
       </div>
@@ -114,16 +126,7 @@
 
 
 <!-- Footer -->
-<footer>
-    <div class="container">
-        <p>Contact us: info@aluminaengagement.com</p>
-        <ul class="social-links">
-            <li><a href="#">Facebook</a></li>
-            <li><a href="#">Twitter</a></li>
-            <li><a href="#">LinkedIn</a></li>
-        </ul>
-    </div>
-</footer>
+
 
  
 {% endblock %}

@@ -2,8 +2,9 @@ from flask import Blueprint, abort, flash, render_template, redirect, url_for, r
 from flask_login import login_required, current_user # type: ignore
 from werkzeug.utils import secure_filename # type: ignore
 from app import db
-from app.forms import UpdateProfileForm, MessageForm
+from app.forms import DonationForm, Event_registration, UpdateProfileForm, MessageForm
 from app.models import Follow, User, Conversation, Message
+from app.utils import read_event_registrations, register_attendees
 
 from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app # type: ignore
 from flask import Blueprint, flash, render_template, redirect, url_for, request, current_app # type: ignore
@@ -12,7 +13,7 @@ from flask_login import login_required, current_user # type: ignore
 from werkzeug.utils import secure_filename # type: ignore
 from app import db
 import uuid
-from app.forms import AnonymousCommentForm, CommentForm, LikeForm, PostForm, UpdateProfileForm
+from app.forms import  CommentForm, PostForm, UpdateProfileForm
 from flask import jsonify
 import os
 
@@ -40,8 +41,9 @@ def admin():
     posts = Post.query.filter_by(category='post').all()
     news = Post.query.filter_by(category='news').all()
     events = Post.query.filter_by(category='event').all()
+    event_registrations = read_event_registrations()
     if current_user.is_authenticated:
-        return render_template('admin.html', posts = posts, news = news, events = events)
+        return render_template('admin.html', posts = posts, news = news, events = events, event_registrations = event_registrations)
     return redirect(url_for('auth.adminLogin'))
 
 @main.route("/all_posts", methods=['GET', 'POST'])
@@ -51,11 +53,11 @@ def posts():
     return render_template('all_posts.html', posts=posts)
 
 
-@main.route("/profile", methods=['GET', 'POST'])
+@main.route("/profile/<int:user_id>", methods=['GET', 'POST'])
 @login_required
-def profile():
+def profile(user_id):
     form = UpdateProfileForm()
-
+    is_current_user = (current_user.id == user_id)
     if form.validate_on_submit():
         current_user.email = form.email.data
         current_user.first_name = form.first_name.data
@@ -74,7 +76,7 @@ def profile():
 
         db.session.commit()
         flash('Your profile has been updated!', 'success')
-        return redirect(url_for('main.profile'))
+        return redirect(url_for('main.profile',user_id=current_user.id))
 
     form.email.data = current_user.email
     form.first_name.data = current_user.first_name
@@ -87,9 +89,7 @@ def profile():
     form.experience.data = current_user.experience
     form.additional_details.data = current_user.additional_details
 
-    is_current_user = True
-
-    return render_template('profile.html', title='Profile', form=form, user=current_user, is_current_user=is_current_user)
+    return render_template('profile.html', title='Profile', form=form, user=current_user, is_current_user=is_current_user, user_id=user_id)
 
 @main.route('/users')
 @login_required
@@ -186,6 +186,16 @@ def conversations_list():
 @login_required
 def start_conversation(user_id):
     user2 = User.query.get_or_404(user_id)
+    
+    # Check if both users are following each other
+    is_following_user2 = Follow.query.filter_by(follower_id=current_user.id, followee_id=user2.id).first()
+    is_followed_by_user2 = Follow.query.filter_by(follower_id=user2.id, followee_id=current_user.id).first()
+    
+    if not is_following_user2 or not is_followed_by_user2:
+        flash("You and the other user need to follow each other before starting a conversation.", "warning")
+        return redirect(url_for('conversations.conversations_list'))  # Redirect to an appropriate view
+    
+    # Check if conversation already exists
     conversation = Conversation.query.filter(
         ((Conversation.user1_id == current_user.id) & (Conversation.user2_id == user2.id)) |
         ((Conversation.user1_id == user2.id) & (Conversation.user2_id == current_user.id))
@@ -197,6 +207,7 @@ def start_conversation(user_id):
         db.session.commit()
 
     return redirect(url_for('conversations.view_conversation', conversation_id=conversation.id))
+
 
 
 messages = Blueprint('messages', __name__)
@@ -237,9 +248,22 @@ def new_post():
     if form.validate_on_submit():
         if form.image_file.data:
             image_file = save_post_picture(form.image_file.data)
-            post = Post(title=form.title.data, content=form.content.data,link = form.link.data,category = form.category.data, user_id=current_user.id, image_file=image_file)
+            post = Post(
+                title=form.title.data, 
+                content=form.content.data,
+                link=form.link.data,
+                category=form.category.data, 
+                user_id=current_user.id, 
+                image_file=image_file
+            )
         else:
-            post = Post(title=form.title.data, content=form.content.data,link= form.link.data,category = form.category.data, user_id=current_user.id, user = current_user)
+            post = Post(
+                title=form.title.data, 
+                content=form.content.data,
+                link=form.link.data,
+                category=form.category.data, 
+                user_id=current_user.id
+            )
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -250,16 +274,12 @@ def new_post():
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     comments = Comment.query.filter_by(post_id=post_id).all()
-    if current_user.is_authenticated:
-        form = CommentForm()
-    else:
-        form = AnonymousCommentForm()
+    
+    form = CommentForm()
 
     if form.validate_on_submit():
         if current_user.is_authenticated:
             comment = Comment(content=form.content.data, post_id=post_id, user_id=current_user.id)
-        else:
-            comment = Comment(content=form.content.data, post_id=post_id, author_name=form.name.data)
         db.session.add(comment)
         db.session.commit()
         flash('Your comment has been added!', 'success')
@@ -271,24 +291,30 @@ def post(post_id):
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     ip_address = request.remote_addr
+    was_liked = False
 
     if current_user.is_authenticated:
-        like = Like.query.filter_by(user_id=current_user.id, post_id=post_id).first()
-        if like:
-            db.session.delete(like)
+        existing_like = Like.query.filter_by(user_id=current_user.id, post_id=post_id).first()
+        if existing_like:
+            db.session.delete(existing_like)
+            was_liked = False
         else:
             new_like = Like(user_id=current_user.id, post_id=post_id)
             db.session.add(new_like)
+            was_liked = True
     else:
-        like = Like.query.filter_by(ip_address=ip_address, post_id=post_id).first()
-        if like:
-            db.session.delete(like)
+        existing_like = Like.query.filter_by(ip_address=ip_address, post_id=post_id).first()
+        if existing_like:
+            db.session.delete(existing_like)
+            was_liked = False
         else:
             new_like = Like(ip_address=ip_address, post_id=post_id)
             db.session.add(new_like)
+            was_liked = True
 
     db.session.commit()
-    return jsonify(success=True)
+    return jsonify(success=True, liked=was_liked)
+
 
 
 
@@ -296,30 +322,37 @@ def like_post(post_id):
 @login_required
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.user != current_user:
+    if post.user_id != current_user.id:
         abort(403)
     form = PostForm()
     if form.validate_on_submit():
+        if form.image_file.data:
+            image_file = save_post_picture(form.image_file.data)
+            post.image_file = image_file
         post.title = form.title.data
         post.content = form.content.data
+        post.link = form.link.data
+        post.category = form.category.data
         db.session.commit()
         flash('Your post has been updated!', 'success')
-        return redirect(url_for('post', post_id=post.id))
+        return redirect(url_for('main.admin'))
     elif request.method == 'GET':
         form.title.data = post.title
         form.content.data = post.content
-    return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
+        form.link.data = post.link
+        form.category.data = post.category
+    return render_template('create_post.html', title='Update Post', form=form, post=post)
 
-@main.route("/post/<int:post_id>/delete", methods=['POST'])
+@main.route("/post/<int:post_id>/delete", methods=['POST', 'GET'])
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.user != current_user:
+    if post.author != current_user:
         abort(403)
     db.session.delete(post)
     db.session.commit()
     flash('Your post has been deleted!', 'success')
-    return redirect(url_for('home'))
+    return redirect(url_for('main.admin'))
 
 
 # SocketIO Events
@@ -373,3 +406,42 @@ def unfollow_user(followee_id):
         flash('You are not following this user.', 'info')
     
     return redirect(url_for('main.view_user_profile', user_id=followee_id))
+
+@main.route("/register/<int:event_id>", methods=['GET', 'POST'])
+def register_for_event(event_id):
+    event = Post.query.get_or_404(event_id)
+    form = Event_registration()
+    if form.validate_on_submit():
+        full_name = form.full_name.data
+        email = form.email.data
+        event_name = event.title
+        register_attendees(full_name, email, event_name)
+        flash('Thank you for registering for this event! Best regards', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('event_registration.html', title='Event Registration', form=form, event_id = event_id )
+
+
+@main.route("/donate", methods=['GET', 'POST'])
+def donate():
+    form = DonationForm()
+    if form.validate_on_submit():
+        amount = form.amount.data
+        payment_method = request.form.get('payment_method')
+        phone_number = form.phone_number.data if payment_method in ['mobile_money', 'airtel_money'] else None
+        card_number = form.card_number.data if payment_method == 'visa' else None
+        card_name = form.card_name.data if payment_method == 'visa' else None
+        expiry_date = form.expiry_date.data if payment_method == 'visa' else None
+        cvv = form.cvv.data if payment_method == 'visa' else None
+
+        # Process the donation based on the payment method
+        if payment_method == 'visa':
+            # Process Visa payment
+            flash('Visa payment processed successfully.', 'success')
+        elif payment_method in ['mobile_money', 'airtel_money']:
+            # Process Mobile Money or Airtel Money payment
+            flash('Mobile Money/Airtel Money payment processed successfully.', 'success')
+        else:
+            flash('Invalid payment method.', 'danger')
+        
+        return redirect(url_for('main.home'))
+    return render_template('donate.html', title='Donate', form=form)

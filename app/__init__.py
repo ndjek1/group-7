@@ -27,7 +27,7 @@ def create_app():
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_DEFAULT_SENDER'] = 'vndjekornom@gmail.com'  # Your SES SMTP username
     app.config['MAIL_USERNAME'] = 'AKIAZQ3DQ3AK46QXN3V7'  # Your SES SMTP username
-    app.config['MAIL_PASSWORD'] = 'BDERfjga12b5sG6Z+0Blnj0hf9E5vX0dHsS9D+tWzwyt'  # Your SES SMTP password
+    app.config['MAIL_PASSWORD'] = ''  # Your SES SMTP password
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
     app.config['DEBUG'] = True

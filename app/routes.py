@@ -3,7 +3,7 @@ from flask_login import login_required, current_user # type: ignore
 from werkzeug.utils import secure_filename # type: ignore
 from app import db
 from app.forms import DonationForm, Event_registration, UpdateProfileForm, MessageForm
-from app.models import Follow, User, Conversation, Message
+from app.models import Admin, Follow, User, Conversation, Message
 from app.utils import read_event_registrations, register_attendees
 
 from flask import Blueprint, abort, app, flash, render_template, redirect, url_for, request,current_app # type: ignore
@@ -246,27 +246,32 @@ def save_post_picture(form_picture):
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        if form.image_file.data:
-            image_file = save_post_picture(form.image_file.data)
-            post = Post(
-                title=form.title.data, 
-                content=form.content.data,
-                link=form.link.data,
-                category=form.category.data, 
-                user_id=current_user.id, 
-                image_file=image_file
-            )
+        admin = Admin.query.get_or_404(current_user.email)
+        if admin:
+            if form.image_file.data:
+                image_file = save_post_picture(form.image_file.data)
+                
+                post = Post(
+                    title=form.title.data, 
+                    content=form.content.data,
+                    link=form.link.data,
+                    category=form.category.data, 
+                    user_id=current_user.id, 
+                    image_file=image_file
+                )
+            else:
+                post = Post(
+                    title=form.title.data, 
+                    content=form.content.data,
+                    link=form.link.data,
+                    category=form.category.data, 
+                    user_id=current_user.id
+                )
+            db.session.add(post)
+            db.session.commit()
+            flash('Your post has been created!', 'success')
         else:
-            post = Post(
-                title=form.title.data, 
-                content=form.content.data,
-                link=form.link.data,
-                category=form.category.data, 
-                user_id=current_user.id
-            )
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'success')
+            flash('Sorry only administrators are allowed to post', 'success')
         return redirect(url_for('main.admin'))
     return render_template('create_post.html', title='New Post', form=form)
 

@@ -171,6 +171,9 @@ def conversations_list():
 
     # Ensure user2 is defined correctly
     for conversation in conversations:
+        
+        last_message = Message.query.filter_by(conversation_id=conversation.id).order_by(Message.date_sent.desc()).first()
+        conversation.last_message = last_message
         if conversation.user1_id == user.id:
             conversation.user2 = User.query.get(conversation.user2_id)
         else:
@@ -450,3 +453,14 @@ def donate():
         
         return redirect(url_for('main.home'))
     return render_template('donate.html', title='Donate', form=form)
+
+@main.route('/search')
+def search():
+    keyword = request.args.get('keyword')
+    if keyword:
+        # Perform search using the keyword
+        users = User.query.filter(User.first_name.ilike(f'%{keyword}%')).all() or User.query.filter(User.last_name.ilike(f'%{keyword}%')).all()
+    else:
+        users = []
+    
+    return render_template('search_result.html', users=users)

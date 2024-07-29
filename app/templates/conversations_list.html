@@ -14,11 +14,20 @@ Conversations
     <div class="row">
         {% for followed_user in followed_users %}
             <div class="col-md-3 mb-4">
-                <div class="card text-center" style="width: 120px; height: 120px; display: flex; justify-content: center; align-items: center;">
-                    <img src="{{ url_for('static', filename='profile_pics/' + followed_user.image_file) }}" class="card-img-top rounded-circle" alt="{{ followed_user.username }}" style="width: 100px; height: 100px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ followed_user.username }}</h5>
+              <div class="panel-heading">
+                <h3 class="panel-title">Following</h3>
+              </div>
+                <div class="card text-center" style="width: 80px; height: 80px; display: flex; justify-content: center; align-items: center;">
+
+                  <a href="{{ url_for('conversations.start_conversation', user_id = followed_user.id) }}">
+                    <span class="avatar avatar-online mt-5 mb-0">
+                    <img src="{{ url_for('static', filename='profile_pics/' + followed_user.image_file) }}" class="card-img-top rounded-circle" alt="{{ followed_user.username }}" >
+                    </span>
+                    <div class="card-body mb-3 ">
+                        <h6 class="card-title">{{ followed_user.username }}</h6>
                     </div>
+                  </a>
+                   
                 </div>
             </div>
         {% endfor %}
@@ -48,7 +57,9 @@ Conversations
                     <small class="pull-right">3 days ago</small>
                     {{ conversation.user2.username if conversation.user1_id == current_user.id else conversation.user1.username }}
                   </h5>
-                  <p class="list-group-item-text">Cogitemus tempora tibique probabo...</p>
+                  <p class="list-group-item-text">
+                    {{ conversation.last_message.content if conversation.last_message else "No messages yet" }}
+                  </p>
                 </div>
               </div>
             </li>
